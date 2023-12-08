@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import axiosApi from '../../axios-api';
-import Dish from '../../components/Dish/Dish';
+import MemoDish from '../../components/Dish/Dish';
 import {ApiDishes, TypeDish} from '../../types';
+import {FormatDate} from '../../components/FormatDate/FormatDate';
 
 const Home = () => {
   const [total, setTotal] = useState<number>(0);
@@ -13,6 +14,7 @@ const Home = () => {
       const response = await axiosApi.get<ApiDishes | null>('/calories.json');
       if (response.status === 200 && response.data) {
         const keys: string[] = Object.keys(response.data);
+        const today = new FormatDate(new Date());
         const current: TypeDish[] = keys.map((id) => {
           return {
             ...response.data[id],
@@ -20,9 +22,13 @@ const Home = () => {
             id
           };
         });
-        setDishes(current);
+        const sorted = current.sort((prev, next) => prev.date > next.date ? 1 : -1);
+        setDishes(sorted);
         setTotal(current.reduce((accumulator, item) => {
-          return accumulator + item.kcal;
+          if (item.date === today.apiFormatDate()) {
+            return accumulator + item.kcal;
+          }
+          return accumulator;
         }, 0));
       } else {
         setTotal(0);
@@ -59,10 +65,11 @@ const Home = () => {
   };
 
   const listOfDishes = dishes.map((item) => (
-    <Dish
+    <MemoDish
       key={item.id}
       id={item.id}
       time={item.time}
+      date={item.date}
       description={item.description}
       kcal={item.kcal}
       onDelete={onDelete}
@@ -76,7 +83,7 @@ const Home = () => {
         <span>Total calories: <span className="fw-medium">{total} kcal</span></span>
         <Link to="/add-meal" className="btn btn-outline-success">Add new meal</Link>
       </div>
-      <div className="d-flex flex-column gap-3">
+      <div className="d-flex flex-column-reverse gap-3">
         {listOfDishes}
       </div>
     </>

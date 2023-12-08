@@ -6,12 +6,14 @@ export interface TypeDish {
   id: string;
   isDeleting: boolean;
   time: 'Breakfast' | 'Snack' | 'Lunch' | 'Dinner';
+  date: string;
   description: string;
   kcal: number;
 }
 
 export interface FormDish {
   time: 'Breakfast' | 'Snack' | 'Lunch' | 'Dinner';
+  date: string;
   description: string;
   kcal: string;
 }

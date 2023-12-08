@@ -3,10 +3,13 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {times} from '../../constants';
 import axiosApi from '../../axios-api';
 import {FormDish, SubmitDish} from '../../types';
+import {FormatDate} from '../../components/FormatDate/FormatDate';
 
 const AddMeal = () => {
+  const current = new FormatDate(new Date()).apiFormatDate();
   const [dish, setDish] = useState<FormDish>({
     time: 'Breakfast',
+    date: current,
     description: '',
     kcal: '',
   });
@@ -50,6 +53,7 @@ const AddMeal = () => {
     try {
       const data: SubmitDish = {
         time: dish.time,
+        date: dish.date,
         description: dish.description,
         kcal: parseFloat(dish.kcal),
       };
@@ -63,6 +67,7 @@ const AddMeal = () => {
     try {
       const data: SubmitDish = {
         time: dish.time,
+        date: dish.date,
         description: dish.description,
         kcal: parseFloat(dish.kcal),
       };
@@ -118,6 +123,19 @@ const AddMeal = () => {
           required
         />
         <label htmlFor="kcal" className="form-label">kcal</label>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="date" className="form-label">Description:</label>
+        <input
+          onChange={onChange}
+          value={dish.date}
+          className="form-control"
+          id="date"
+          name="date"
+          placeholder="Description"
+          type="date"
+          required
+        />
       </div>
       <button type="submit" className="btn btn-outline-success">Add</button>
     </form>
