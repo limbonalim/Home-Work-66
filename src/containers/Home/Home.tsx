@@ -2,15 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import axiosApi from '../../axios-api';
 import MemoDish from '../../components/Dish/Dish';
+import Loading from '../../components/Loading/Loading';
 import {ApiDishes, TypeDish} from '../../types';
 import {FormatDate} from '../../components/FormatDate/FormatDate';
 
 const Home = () => {
   const [total, setTotal] = useState<number>(0);
   const [dishes, setDishes] = useState<TypeDish[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const request = async () => {
     try {
+      setLoading(true);
       const response = await axiosApi.get<ApiDishes | null>('/calories.json');
       if (response.status === 200 && response.data) {
         const keys: string[] = Object.keys(response.data);
@@ -37,6 +40,8 @@ const Home = () => {
       }
     } catch (error: Error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,7 +89,7 @@ const Home = () => {
         <Link to="/add-meal" className="btn btn-outline-success">Add new meal</Link>
       </div>
       <div className="d-flex flex-column-reverse gap-3">
-        {listOfDishes}
+        {loading ? <Loading/> : listOfDishes}
       </div>
     </>
   );

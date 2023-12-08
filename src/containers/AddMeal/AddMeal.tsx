@@ -2,8 +2,10 @@ import React, {ChangeEvent, FormEvent, useCallback, useEffect, useState} from 'r
 import {useNavigate, useParams} from 'react-router-dom';
 import {times} from '../../constants';
 import axiosApi from '../../axios-api';
-import {FormDish, SubmitDish} from '../../types';
+import Loading from '../../components/Loading/Loading';
 import {FormatDate} from '../../components/FormatDate/FormatDate';
+import {FormDish, SubmitDish} from '../../types';
+
 
 const AddMeal = () => {
   const current = new FormatDate(new Date()).apiFormatDate();
@@ -13,6 +15,7 @@ const AddMeal = () => {
     description: '',
     kcal: '',
   });
+  const [loading, setLoading] = useState<boolean>(false);
   const {id} = useParams();
   const navigate = useNavigate();
   const listOfOptions = times.map((item) => (
@@ -21,6 +24,7 @@ const AddMeal = () => {
 
   const request = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await axiosApi.get<SubmitDish | null>(`/calories/${id}.json`);
       if (response.status === 200 && response.data) {
         setDish({
@@ -30,6 +34,8 @@ const AddMeal = () => {
       }
     } catch (error: Error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }, [id]);
 
@@ -88,57 +94,60 @@ const AddMeal = () => {
   };
 
   return (
-    <form onSubmit={onFormSubmit}>
-      <div className="mb-3">
-        <select
-          onChange={onChange}
-          value={dish.time}
-          name="time"
-          className="form-select"
-        >
-          {listOfOptions}
-        </select>
-      </div>
-      <div className="mb-3">
-        <label htmlFor="description" className="form-label">Description:</label>
-        <input
-          onChange={onChange}
-          value={dish.description}
-          className="form-control"
-          id="description"
-          name="description"
-          placeholder="Description"
-          required
-        />
-      </div>
-      <div className="mb-3">
-        <input
-          onChange={onChange}
-          value={dish.kcal}
-          className="form-control w-25 d-inline-block me-2"
-          id="kcal"
-          name="kcal"
-          type="number"
-          placeholder="kcal"
-          required
-        />
-        <label htmlFor="kcal" className="form-label">kcal</label>
-      </div>
-      <div className="mb-3">
-        <label htmlFor="date" className="form-label">Description:</label>
-        <input
-          onChange={onChange}
-          value={dish.date}
-          className="form-control"
-          id="date"
-          name="date"
-          placeholder="Description"
-          type="date"
-          required
-        />
-      </div>
-      <button type="submit" className="btn btn-outline-success">Add</button>
-    </form>
+    <>
+      {loading ? <Loading/> :
+        <form onSubmit={onFormSubmit}>
+          <div className="mb-3">
+            <select
+              onChange={onChange}
+              value={dish.time}
+              name="time"
+              className="form-select"
+            >
+              {listOfOptions}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
+            <input
+              onChange={onChange}
+              value={dish.description}
+              className="form-control"
+              id="description"
+              name="description"
+              placeholder="Description"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              onChange={onChange}
+              value={dish.kcal}
+              className="form-control w-25 d-inline-block me-2"
+              id="kcal"
+              name="kcal"
+              type="number"
+              placeholder="kcal"
+              required
+            />
+            <label htmlFor="kcal" className="form-label">kcal</label>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="date" className="form-label">Description:</label>
+            <input
+              onChange={onChange}
+              value={dish.date}
+              className="form-control"
+              id="date"
+              name="date"
+              placeholder="Description"
+              type="date"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-outline-success">Add</button>
+        </form>}
+    </>
   );
 };
 
