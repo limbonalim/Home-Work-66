@@ -4,6 +4,7 @@ export interface ApiDishes {
 
 export interface TypeDish {
   id: string;
+  isDeleting: boolean;
   time: 'Breakfast' | 'Snack' | 'Lunch' | 'Dinner';
   description: string;
   kcal: number;
@@ -15,5 +16,7 @@ export interface FormDish {
   kcal: string;
 }
 
-export type SubmitDish = Omit<TypeDish, 'id'>
+export type SubmitDish = Omit<TypeDish, 'id' | 'isDeleting'>
+
+
 

@@ -1,7 +1,8 @@
-import React, {ChangeEvent, FormEvent, useState} from 'react';
+import React, {ChangeEvent, FormEvent, useCallback, useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import {times} from '../../constants';
-import {FormDish, SubmitDish} from '../../types';
 import axiosApi from '../../axios-api';
+import {FormDish, SubmitDish} from '../../types';
 
 const AddMeal = () => {
   const [dish, setDish] = useState<FormDish>({
@@ -9,9 +10,31 @@ const AddMeal = () => {
     description: '',
     kcal: '',
   });
+  const {id} = useParams();
+  const navigate = useNavigate();
   const listOfOptions = times.map((item) => (
     <option key={item} value={item}>{item}</option>
   ));
+
+  const request = useCallback(async () => {
+    try {
+      const response = await axiosApi.get<SubmitDish | null>(`/calories/${id}.json`);
+      if (response.status === 200 && response.data) {
+        setDish({
+          ...response.data,
+          kcal: response.data.kcal.toString(),
+        });
+      }
+    } catch (error: Error) {
+      console.log(error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      void request();
+    }
+  }, [request]);
 
   const onChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const {name, value} = event.target;
@@ -23,8 +46,7 @@ const AddMeal = () => {
     });
   };
 
-  const onFormSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+  const createMeal = async () => {
     try {
       const data: SubmitDish = {
         time: dish.time,
@@ -36,6 +58,30 @@ const AddMeal = () => {
       console.log(error);
     }
   };
+
+  const editMeal = async () => {
+    try {
+      const data: SubmitDish = {
+        time: dish.time,
+        description: dish.description,
+        kcal: parseFloat(dish.kcal),
+      };
+      await axiosApi.put<SubmitDish>(`/calories/${id}.json`, data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onFormSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (id) {
+      await editMeal();
+    } else {
+      await createMeal();
+    }
+    navigate('/');
+  };
+
   return (
     <form onSubmit={onFormSubmit}>
       <div className="mb-3">
