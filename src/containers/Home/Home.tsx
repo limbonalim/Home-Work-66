@@ -1,23 +1,28 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import axiosApi from '../../axios-api';
 import Dish from '../../components/Dish/Dish';
+import {ApiDishes, TypeDish} from '../../types';
 
 const Home = () => {
   const [total, setTotal] = useState<number>(0);
-  const [dishes, setDishes] = useState([]);
+  const [dishes, setDishes] = useState<TypeDish[]>([]);
 
   const request = async () => {
     try {
-      const response = await axiosApi.get('/calorie-tracker.json');
-      if (response.status === 200) {
-        const keys = Object.keys(response.data);
-        setDishes(keys.map((id) => {
+      const response = await axiosApi.get<ApiDishes | null>('/calories.json');
+      if (response.status === 200 && response.data) {
+        const keys: string[] = Object.keys(response.data);
+        const current: TypeDish[] = keys.map((id) => {
           return {
             ...response.data[id],
             id
           };
-        }));
+        });
+        setDishes(current);
+        setTotal(current.reduce((accumulator, item) => {
+          return accumulator + item.kcal;
+        }, 0));
       } else {
         return;
       }
@@ -37,10 +42,10 @@ const Home = () => {
   return (
     <>
       <div className="d-flex justify-content-between p-5">
-        <span>Total calories: <span>{total} kcal</span></span>
+        <span>Total calories: <span className="fw-medium">{total} kcal</span></span>
         <Link to="/add-meal" className="btn btn-outline-success">Add new meal</Link>
       </div>
-      <div>
+      <div className="d-flex flex-column gap-3">
         {listOfDishes}
       </div>
     </>
