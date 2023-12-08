@@ -6,8 +6,11 @@ import Loading from '../../components/Loading/Loading';
 import {FormatDate} from '../../components/FormatDate/FormatDate';
 import {FormDish, SubmitDish} from '../../types';
 
+interface Props {
+  getError: (message: string) => void;
+}
 
-const AddMeal = () => {
+const AddMeal: React.FC<Props> = ({getError}) => {
   const current = new FormatDate(new Date()).apiFormatDate();
   const [dish, setDish] = useState<FormDish>({
     time: 'Breakfast',
@@ -33,7 +36,7 @@ const AddMeal = () => {
         });
       }
     } catch (error: Error) {
-      console.log(error);
+      getError(error.message);
     } finally {
       setLoading(false);
     }
@@ -65,7 +68,7 @@ const AddMeal = () => {
       };
       await axiosApi.post<SubmitDish>('/calories.json', data);
     } catch (error) {
-      console.log(error);
+      getError(error.message);
     }
   };
 
@@ -79,7 +82,7 @@ const AddMeal = () => {
       };
       await axiosApi.put<SubmitDish>(`/calories/${id}.json`, data);
     } catch (error) {
-      console.log(error);
+      getError(error.message);
     }
   };
 

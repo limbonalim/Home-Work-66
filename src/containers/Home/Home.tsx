@@ -6,7 +6,11 @@ import Loading from '../../components/Loading/Loading';
 import {ApiDishes, TypeDish} from '../../types';
 import {FormatDate} from '../../components/FormatDate/FormatDate';
 
-const Home = () => {
+interface Props {
+  getError: (message: string) => void;
+}
+
+const Home: React.FC<Props> = ({getError}) => {
   const [total, setTotal] = useState<number>(0);
   const [dishes, setDishes] = useState<TypeDish[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,7 +43,7 @@ const Home = () => {
         return;
       }
     } catch (error: Error) {
-      console.log(error);
+      getError(error.message);
     } finally {
       setLoading(false);
     }
@@ -65,7 +69,7 @@ const Home = () => {
       await axiosApi.delete(`/calories/${id}.json`);
       await request();
     } catch (error: Error) {
-      console.log(error);
+      getError(error.message);
     }
   };
 
