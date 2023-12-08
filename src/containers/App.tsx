@@ -1,13 +1,16 @@
 import Dish from '../components/Dish/Dish';
+import Home from './Home/Home';
+import {Route, Routes} from 'react-router-dom';
+import AddMeal from './AddMeal/AddMeal';
 
 
-function App() {
-
-  return (
-    <>
-      <Dish time="Breakfast" description="Eggs, toast" kcal={500}/>
-    </>
-  )
-}
+const App = () => (
+  <>
+    <Routes>
+      <Route path="/" element={<Home/>}/>
+      <Route path="/add-meal" element={<AddMeal/>}/>
+    </Routes>
+  </>
+);
 
 export default App
