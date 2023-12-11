@@ -4,14 +4,14 @@ import {times} from '../../constants';
 import axiosApi from '../../axios-api';
 import Loading from '../../components/Loading/Loading';
 import {FormatDate} from '../../components/FormatDate/FormatDate';
-import {FormDish, SubmitDish} from '../../types';
+import {FormDish, FormNameType, SubmitDish} from '../../types';
 
 interface Props {
   getError: (message: string) => void;
 }
 
 const AddMeal: React.FC<Props> = ({getError}) => {
-  const current = new FormatDate(new Date()).apiFormatDate();
+  const current = new FormatDate(new Date().toString()).apiFormatDate();
   const [dish, setDish] = useState<FormDish>({
     time: 'Breakfast',
     date: current,
@@ -19,6 +19,10 @@ const AddMeal: React.FC<Props> = ({getError}) => {
     kcal: '',
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const [formName, setFormName] = useState<FormNameType>({
+    title: 'Add meal',
+    button: 'Add',
+  });
   const {id} = useParams();
   const navigate = useNavigate();
   const listOfOptions = times.map((item) => (
@@ -28,6 +32,10 @@ const AddMeal: React.FC<Props> = ({getError}) => {
   const request = useCallback(async () => {
     try {
       setLoading(true);
+      setFormName({
+        title: 'Edit form',
+        button: 'Edit',
+      });
       const response = await axiosApi.get<SubmitDish | null>(`/calories/${id}.json`);
       if (response.status === 200 && response.data) {
         setDish({
@@ -100,6 +108,7 @@ const AddMeal: React.FC<Props> = ({getError}) => {
     <>
       {loading ? <Loading/> :
         <form onSubmit={onFormSubmit}>
+          <h1>{formName.title}</h1>
           <div className="mb-3">
             <select
               onChange={onChange}
@@ -148,7 +157,11 @@ const AddMeal: React.FC<Props> = ({getError}) => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-outline-success">Add</button>
+          <button
+            disabled={loading}
+            type="submit"
+            className="btn btn-outline-success"
+          >{formName.button}</button>
         </form>}
     </>
   );

@@ -20,5 +20,8 @@ export interface FormDish {
 
 export type SubmitDish = Omit<TypeDish, 'id' | 'isDeleting'>
 
-
+export interface FormNameType {
+  title: string;
+  button: string;
+}
 
